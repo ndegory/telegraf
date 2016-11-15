@@ -33,15 +33,20 @@ package:
 	./scripts/build.py --package --version="$(VERSION)" --platform=linux --arch=all --upload
 
 # Get dependencies and use gdm to checkout changesets
+# trash is needed to create the vendor folder with Docker packages (vendored)
 prepare:
 	go get github.com/sparrc/gdm
+	go get github.com/rancher/trash
 	gdm restore
+	trash
 
 # Use the windows godeps file to prepare dependencies
 prepare-windows:
 	go get github.com/sparrc/gdm
+	go get github.com/rancher/trash
 	gdm restore
 	gdm restore -f Godeps_windows
+	trash
 
 # Run all docker containers necessary for unit tests
 docker-run:

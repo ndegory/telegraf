@@ -9,8 +9,8 @@ import (
 
 	"golang.org/x/net/context"
 
-	"github.com/docker/engine-api/types"
-	"github.com/docker/engine-api/types/registry"
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/registry"
 	"github.com/influxdata/telegraf/testutil"
 
 	"github.com/stretchr/testify/require"
@@ -273,7 +273,6 @@ func (d FakeDockerClient) Info(ctx context.Context) (types.Info, error) {
 		Name:               "absol",
 		SwapLimit:          false,
 		IPv4Forwarding:     true,
-		ExecutionDriver:    "native-0.2",
 		ExperimentalBuild:  false,
 		CPUCfsPeriod:       true,
 		RegistryConfig: &registry.ServiceConfig{

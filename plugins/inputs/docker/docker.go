@@ -13,8 +13,8 @@ import (
 
 	"golang.org/x/net/context"
 
-	"github.com/docker/engine-api/client"
-	"github.com/docker/engine-api/types"
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/client"
 	"github.com/influxdata/telegraf"
 	"github.com/influxdata/telegraf/internal"
 	"github.com/influxdata/telegraf/plugins/inputs"
@@ -36,7 +36,7 @@ type Docker struct {
 type DockerClient interface {
 	Info(ctx context.Context) (types.Info, error)
 	ContainerList(ctx context.Context, options types.ContainerListOptions) ([]types.Container, error)
-	ContainerStats(ctx context.Context, containerID string, stream bool) (io.ReadCloser, error)
+	ContainerStats(ctx context.Context, containerID string, stream bool) (types.ContainerStats, error)
 }
 
 // KB, MB, GB, TB, PB...human friendly
@@ -90,7 +90,7 @@ func (d *Docker) Gather(acc telegraf.Accumulator) error {
 				return err
 			}
 		} else if d.Endpoint == "" {
-			c, err = client.NewClient("unix:///var/run/docker.sock", "", nil, defaultHeaders)
+			c, err = client.NewClient("unix:///var/run/docker.sock", "v1.18", nil, defaultHeaders)
 			if err != nil {
 				return err
 			}
@@ -247,8 +247,8 @@ func (d *Docker) gatherContainer(
 	if err != nil {
 		return fmt.Errorf("Error getting docker stats: %s", err.Error())
 	}
-	defer r.Close()
-	dec := json.NewDecoder(r)
+	defer r.Body.Close()
+	dec := json.NewDecoder(r.Body)
 	if err = dec.Decode(&v); err != nil {
 		if err == io.EOF {
 			return nil
